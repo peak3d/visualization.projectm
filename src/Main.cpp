@@ -56,10 +56,6 @@ d4rk@xbmc.org
 #include <kodi/addon-instance/Visualization.h>
 #include <threads/mutex.h>
 
-#if !defined(__APPLE__)
-#include <GL/gl.h>
-#endif
-
 #include <libprojectM/projectM.hpp>
 
 class ATTRIBUTE_HIDDEN CVisualizationProjectM

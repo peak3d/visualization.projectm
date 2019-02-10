@@ -1,1 +1,1 @@
-projectm https://github.com/projectM-visualizer/projectm/archive/v3.1.0.tar.gz
+projectm https://github.com/projectM-visualizer/projectm/archive/8278444652cae587802d58d649699ac870b5ffa6.tar.gz
