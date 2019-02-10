@@ -2,7 +2,7 @@ project(projectm)
 
 cmake_minimum_required(VERSION 2.8)
 
-if (CORE_SYSTEM_NAME STREQUAL  "android" OR CORE_SYSTEM_NAME STREQUAL  "ios")
+if (APP_RENDER_SYSTEM STREQUAL "gles")
   set(PROJECTM_CONFIG "--enable-gles")
 endif()
 
