@@ -26,6 +26,26 @@ else()
               ${extra_libs})
 endif()
 
+if(APP_RENDER_SYSTEM STREQUAL "gl" OR NOT APP_RENDER_SYSTEM)
+  find_package(OpenGL)
+  if(OPENGL_FOUND)
+    set(DEPLIBS ${DEPLIBS} ${OPENGL_LIBRARIES})
+    set(APP_RENDER_SYSTEM gl)
+  endif()
+endif()
+
+if(APP_RENDER_SYSTEM STREQUAL "gles" OR NOT APP_RENDER_SYSTEM)
+  find_package(OpenGLES3)
+  if(OPENGLES3_FOUND)
+    set(DEPLIBS ${DEPLIBS} ${OPENGLES3_LIBRARIES})
+    set(APP_RENDER_SYSTEM gles)
+  endif()
+endif()
+
+if(NOT APP_RENDER_SYSTEM)
+  message(FATAL_ERROR "No rendering API found. Bailing")
+endif()
+
 set(PM_SOURCES src/Main.cpp)
 
 include_directories(${INCLUDES})
