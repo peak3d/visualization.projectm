@@ -1,0 +1,130 @@
+diff --git a/configure.ac b/configure.ac
+index 7ab81913..492d6752 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -126,8 +126,10 @@ AC_PREFIX_DEFAULT([/usr/local])
+ 
+ AC_PROG_MKDIR_P
+ 
+-AX_CHECK_COMPILE_FLAG([-stdlib=libc++], [
++AS_IF([test x"$CLANG" = "xyes"], [
++  AX_CHECK_COMPILE_FLAG([-stdlib=libc++], [
+                         CXXFLAGS="$CXXFLAGS -stdlib=libc++"])
++])
+ 
+ AX_CHECK_COMPILE_FLAG([-std=c++11], [
+                         CXXFLAGS="$CXXFLAGS -std=c++11"])
+@@ -165,6 +167,7 @@ my_CFLAGS="-Wall -Wchar-subscripts -Wformat-security -Wpointer-arith -Wshadow -W
+ #my_CFLAGS+="-fsanitize=address -fno-omit-frame-pointer "
+ my_CFLAGS+='-DDATADIR_PATH=\""$(pkgdatadir)"\" '
+ my_CFLAGS+='-I$(top_srcdir)/vendor '
++my_CFLAGS+='-include $(top_builddir)/config.h'
+ AC_SUBST([my_CFLAGS])
+ 
+ 
+diff --git a/m4/autoconf-archive/ax_check_gl.m4 b/m4/autoconf-archive/ax_check_gl.m4
+index 0b9449b1..ddd8baf5 100755
+--- a/m4/autoconf-archive/ax_check_gl.m4
++++ b/m4/autoconf-archive/ax_check_gl.m4
+@@ -97,6 +97,8 @@ m4_define([_AX_CHECK_GL_PROGRAM],
+ #   include <GL/gl.h>
+ # elif defined(HAVE_OPENGL_GL_H)
+ #   include <OpenGL/gl.h>
++# elif defined(HAVE_GLES_GL_H)
++#   include <GLES/gl.h>
+ # else
+ #   error no gl.h
+ # endif
+@@ -274,7 +276,7 @@ AC_DEFUN([AX_CHECK_GL],
+ 
+  dnl this was cache
+  _AX_CHECK_GL_SAVE_FLAGS([CFLAGS])
+- AC_CHECK_HEADERS([GL/gl.h OpenGL/gl.h],
++ AC_CHECK_HEADERS([GL/gl.h OpenGL/gl.h GLES/gl.h],
+    [ax_check_gl_have_headers="yes";break])
+  _AX_CHECK_GL_RESTORE_FLAGS([CFLAGS])
+ 
+diff --git a/src/libprojectM/Renderer/TextureManager.cpp b/src/libprojectM/Renderer/TextureManager.cpp
+index e3bf756f..c309272d 100644
+--- a/src/libprojectM/Renderer/TextureManager.cpp
++++ b/src/libprojectM/Renderer/TextureManager.cpp
+@@ -84,12 +84,12 @@ TextureManager::TextureManager(const std::string _presetsURL, const int texsizeX
+         blurTextures.push_back(textureBlur);
+     }
+ 
+-    PerlinNoise noise;
++    PerlinNoise *noise = new PerlinNoise();
+ 
+     GLuint noise_texture_lq_lite;
+     glGenTextures(1, &noise_texture_lq_lite);
+     glBindTexture(GL_TEXTURE_2D, noise_texture_lq_lite);
+-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 32, 32, 0, GL_RGB, GL_FLOAT, noise.noise_lq_lite);
++    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 32, 32, 0, GL_RGB, GL_FLOAT, noise->noise_lq_lite);
+     Texture * textureNoise_lq_lite = new Texture("noise_lq_lite", noise_texture_lq_lite, GL_TEXTURE_2D, 32, 32, false);
+     textureNoise_lq_lite->getSampler(GL_REPEAT, GL_LINEAR);
+     textures["noise_lq_lite"] = textureNoise_lq_lite;
+@@ -97,7 +97,7 @@ TextureManager::TextureManager(const std::string _presetsURL, const int texsizeX
+     GLuint noise_texture_lq;
+     glGenTextures(1, &noise_texture_lq);
+     glBindTexture(GL_TEXTURE_2D, noise_texture_lq);
+-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 256, 256, 0, GL_RGB, GL_FLOAT, noise.noise_lq);
++    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 256, 256, 0, GL_RGB, GL_FLOAT, noise->noise_lq);
+     Texture * textureNoise_lq = new Texture("noise_lq", noise_texture_lq, GL_TEXTURE_2D, 256, 256, false);
+     textureNoise_lq->getSampler(GL_REPEAT, GL_LINEAR);
+     textures["noise_lq"] = textureNoise_lq;
+@@ -105,7 +105,7 @@ TextureManager::TextureManager(const std::string _presetsURL, const int texsizeX
+     GLuint noise_texture_mq;
+     glGenTextures(1, &noise_texture_mq);
+     glBindTexture(GL_TEXTURE_2D, noise_texture_mq);
+-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 256, 256, 0, GL_RGB, GL_FLOAT, noise.noise_mq);
++    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 256, 256, 0, GL_RGB, GL_FLOAT, noise->noise_mq);
+     Texture * textureNoise_mq = new Texture("noise_mq", noise_texture_mq, GL_TEXTURE_2D, 256, 256, false);
+     textureNoise_mq->getSampler(GL_REPEAT, GL_LINEAR);
+     textures["noise_mq"] = textureNoise_mq;
+@@ -113,7 +113,7 @@ TextureManager::TextureManager(const std::string _presetsURL, const int texsizeX
+     GLuint noise_texture_hq;
+     glGenTextures(1, &noise_texture_hq);
+     glBindTexture(GL_TEXTURE_2D, noise_texture_hq);
+-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 256, 256, 0, GL_RGB, GL_FLOAT, noise.noise_hq);
++    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 256, 256, 0, GL_RGB, GL_FLOAT, noise->noise_hq);
+     Texture * textureNoise_hq = new Texture("noise_hq", noise_texture_hq, GL_TEXTURE_2D, 256, 256, false);
+     textureNoise_hq->getSampler(GL_REPEAT, GL_LINEAR);
+     textures["noise_hq"] = textureNoise_hq;
+@@ -121,7 +121,7 @@ TextureManager::TextureManager(const std::string _presetsURL, const int texsizeX
+     GLuint noise_texture_lq_vol;
+     glGenTextures( 1, &noise_texture_lq_vol );
+     glBindTexture( GL_TEXTURE_3D, noise_texture_lq_vol );
+-    glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA, 32 ,32 ,32 ,0 ,GL_RGB ,GL_FLOAT ,noise.noise_lq_vol);
++    glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA, 32 ,32 ,32 ,0 ,GL_RGB ,GL_FLOAT ,noise->noise_lq_vol);
+     Texture * textureNoise_lq_vol = new Texture("noisevol_lq", noise_texture_lq_vol, GL_TEXTURE_3D, 32, 32, false);
+     textureNoise_lq_vol->getSampler(GL_REPEAT, GL_LINEAR);
+     textures["noisevol_lq"] = textureNoise_lq_vol;
+@@ -129,10 +129,12 @@ TextureManager::TextureManager(const std::string _presetsURL, const int texsizeX
+     GLuint noise_texture_hq_vol;
+     glGenTextures( 1, &noise_texture_hq_vol );
+     glBindTexture( GL_TEXTURE_3D, noise_texture_hq_vol );
+-    glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA, 32, 32, 32, 0, GL_RGB, GL_FLOAT, noise.noise_hq_vol);
++    glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA, 32, 32, 32, 0, GL_RGB, GL_FLOAT, noise->noise_hq_vol);
+     Texture * textureNoise_hq_vol = new Texture("noisevol_hq", noise_texture_hq_vol, GL_TEXTURE_3D, 32, 32, false);
+     textureNoise_hq_vol->getSampler(GL_REPEAT, GL_LINEAR);
+     textures["noisevol_hq"] = textureNoise_hq_vol;
++
++    delete noise;
+ }
+ 
+ TextureManager::~TextureManager()
+diff --git a/src/libprojectM/projectM.cpp b/src/libprojectM/projectM.cpp
+index b2ef6e86..e2a146d3 100755
+--- a/src/libprojectM/projectM.cpp
++++ b/src/libprojectM/projectM.cpp
+@@ -76,8 +76,8 @@ projectM::~projectM()
+     worker_sync.finish_up();
+     printf("e");
+     pthread_join(thread, &status);
+-    printf("a");
+-    pthread_detach(thread);
++//    printf("a");
++//    pthread_detach(thread);
+     printf("n");
+     #ifdef SYNC_PRESET_SWITCHES
+     pthread_mutex_destroy( &preset_mutex );
