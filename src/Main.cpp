@@ -70,9 +70,9 @@ public:
   virtual void AudioData(const float* audioData, int audioDataLength, float *freqData, int freqDataLength) override;
   virtual bool GetPresets(std::vector<std::string>& presets) override;
   virtual bool LoadPreset(int select) override;
-  virtual bool PrevPreset();
-  virtual bool NextPreset();
-  virtual bool LockPreset(bool lockUnlock);
+  virtual bool PrevPreset() override;
+  virtual bool NextPreset() override;
+  virtual bool LockPreset(bool lockUnlock) override;
   virtual int GetActivePreset() override;
   virtual bool RandomPreset() override;
   virtual bool IsLocked() override;
@@ -214,7 +214,7 @@ bool CVisualizationProjectM::RandomPreset()
 {
   P8PLATFORM::CLockObject lock(m_pmMutex);
   m_projectM->setShuffleEnabled(m_configPM.shuffleEnabled);
-  return true; 
+  return true;
 }
 
 bool CVisualizationProjectM::LockPreset(bool lockUnlock)
@@ -224,7 +224,7 @@ bool CVisualizationProjectM::LockPreset(bool lockUnlock)
   unsigned preset;
   m_projectM->selectedPresetIndex(preset);
   m_projectM->selectPreset(preset);
-  return true; 
+  return true;
 }
 
 //-- GetPresets ---------------------------------------------------------------
