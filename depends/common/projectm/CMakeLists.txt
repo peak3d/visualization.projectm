@@ -1,8 +1,28 @@
 project(projectm)
 
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.3)
 
-if (APP_RENDER_SYSTEM STREQUAL "gles")
+find_package(Kodi REQUIRED) # for APP_RENDER_SYSTEM definition
+
+if(APP_RENDER_SYSTEM STREQUAL "gl" OR NOT APP_RENDER_SYSTEM)
+  find_package(OpenGL)
+  if(OPENGL_FOUND)
+    set(APP_RENDER_SYSTEM gl)
+  endif()
+endif()
+
+if(APP_RENDER_SYSTEM STREQUAL "gles" OR NOT APP_RENDER_SYSTEM)
+  find_package(OpenGLES3)
+  if(OPENGLES3_FOUND)
+    set(APP_RENDER_SYSTEM gles)
+  endif()
+endif()
+
+if(NOT APP_RENDER_SYSTEM)
+  message(FATAL_ERROR "No rendering API found. Bailing")
+endif()
+
+if(APP_RENDER_SYSTEM STREQUAL "gles")
   set(PROJECTM_CONFIG "--enable-gles")
 endif()
 
