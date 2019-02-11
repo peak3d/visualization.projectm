@@ -1,6 +1,10 @@
 project(ftgl)
 
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 3.3)
+
+find_package(Freetype REQUIRED)
+include_directories(${FREETYPE_INCLUDE_DIRS})
+
 enable_language(CXX)
 
 include(ExternalProject)
