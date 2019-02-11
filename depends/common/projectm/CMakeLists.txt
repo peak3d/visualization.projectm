@@ -3,6 +3,7 @@ project(projectm)
 cmake_minimum_required(VERSION 3.3)
 
 find_package(Kodi REQUIRED) # for APP_RENDER_SYSTEM definition
+find_package(SDL2)
 
 if(APP_RENDER_SYSTEM STREQUAL "gl" OR NOT APP_RENDER_SYSTEM)
   find_package(OpenGL)
@@ -24,6 +25,9 @@ endif()
 
 if(APP_RENDER_SYSTEM STREQUAL "gles")
   set(PROJECTM_CONFIG "--enable-gles")
+endif()
+if(SDL2_FOUND)
+  list(APPEND PROJECTM_CONFIG "--enable-sdl")
 endif()
 
 include(ExternalProject)

@@ -7,8 +7,6 @@ if(PACKAGE_CONFIG_PATH)
   set(ENV{PKG_CONFIG_PATH} ${PACKAGE_CONFIG_PATH})
 endif()
 
-add_definitions(-DHAS_SDL_OPENGL)
-
 find_package(Kodi REQUIRED)
 find_package(p8-platform REQUIRED)
 find_package(ProjectM 3.1.0 REQUIRED)
